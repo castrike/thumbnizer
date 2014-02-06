@@ -27,7 +27,7 @@ Since we are using Symfony, Execute the `check.php` script from the command line
 
 3) Using the Application
 --------------------------------
-
+    [Your CDN]/thumbnail/[width]/[height]/[public image url]
 
 
 4) Coming Soon
