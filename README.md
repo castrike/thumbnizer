@@ -42,8 +42,6 @@ Setup Apache to allow encoded slashes
 - More functions. ( Crop image by %, add effects, rotate image )
 - Work as an API (Using API keys and stufff)
 
-All libraries and bundles included in the Symfony Standard Edition are
-released under the MIT or BSD license.
 
 Enjoy!
 
