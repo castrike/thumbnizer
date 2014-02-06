@@ -25,6 +25,12 @@ Since we are using Symfony, Execute the `check.php` script from the command line
 
     php app/check.php
 
+Setup Apache to allow encoded slashes
+
+    AllowEncodedSlashes On
+
+  * This can be added in under your virtual host settings.
+
 3) Using the Application
 --------------------------------
     [Your CDN]/thumbnail/[width]/[height]/[public image url]
