@@ -1,0 +1,7 @@
+parameters:
+#    thumbnizer_processing.example.class: Thumbnizer\ProcessingBundle\Example
+
+services:
+#    thumbnizer_processing.example:
+#        class: %thumbnizer_processing.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

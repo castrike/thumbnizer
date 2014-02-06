@@ -1,0 +1,9 @@
+thumbnizer_default_route:
+   path: /
+   defaults: { _controller: ThumbnizerProcessingBundle:Processing:index}
+
+thumbnizer_processing_route1:
+   path: /thumbnail/{width}/{height}/{source}
+   defaults: { _controller: ThumbnizerProcessingBundle:Processing:processingWHP}
+   requirements:
+        source: .+

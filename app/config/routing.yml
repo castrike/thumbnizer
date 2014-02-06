@@ -1,0 +1,4 @@
+thumbnizer_processing:
+    resource: "@ThumbnizerProcessingBundle/Resources/config/routing.yml"
+    prefix:   /
+
