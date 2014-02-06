@@ -15,7 +15,7 @@ Thumbnizer uses [Composer][2], just like symfony.
 
 If you don't have Composer yet, download it and follow the instructions from http://getcomposer.org/.
   
-  curl -s http://getcomposer.org/installer | php
+    curl -s http://getcomposer.org/installer | php
 
 
 2) Checking your System Configuration
