@@ -5,3 +5,6 @@ services:
 #    thumbnizer_processing.example:
 #        class: %thumbnizer_processing.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]
+    #thumbnizer_processor:
+        #class:	Thumbnizer\ProcessingBundle\ImageProcessor
+        #arguments:	[image]

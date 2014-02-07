@@ -45,6 +45,10 @@ Setup Apache to allow encoded slashes
 
 Enjoy!
 
+CREDITS:
+Thanks to marchibbins for the Filters and Effects.
+https://github.com/marchibbins/GD-Filter-testing
+
 [1]:  http://symfony.com/doc/2.4/quick_tour/the_big_picture.html
 [2]:  http://getcomposer.org/
 
