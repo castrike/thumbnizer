@@ -39,6 +39,9 @@ class ProcessingController extends Controller {
     	} 
     }
 
+
+    
+
     /**
      *	processingWHE
      *	Crop image to a given width and height and return the cropped version

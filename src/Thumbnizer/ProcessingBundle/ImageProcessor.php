@@ -76,6 +76,30 @@ class ImageProcessor {
 		return $this;
 	}
 
+	public function resizeByWidthOrHeight($newWidth,$newHeight) {
+		if( !( ($newWidth == "auto" && is_numeric($newHeight) ) || 
+			   ($newHeight == "auto" && is_numeric($newWidth) ) ) ) {
+			throw new \Exception("Invalid width/height parameters.");
+		}
+		// Retrieve original's image width and height.
+		list($width,$height) = getimagesize($this->imageInfo['src']);
+		// Compute dimensions
+		$dimensions = array();
+		// I rather be dancing than doing math.
+		switch($newWidth) {
+			// Resize image by height
+			case "auto":
+				$newWidth = round($width * $newHeight / $height,2); 
+				break;
+			// Resize image by width
+			default:
+				$newHeight = round($height * $newWidth / $width,2); 
+		}
+		$this->canvas = imagecreatetruecolor ($newWidth, $newHeight);
+		imagecopyresized($this->canvas, $this->image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+		return $this;
+	}
+
 	public function resizeByPercent($percent) {
 		if(!is_numeric($percent) || $percent < 0) {
 			throw new \Exception("Invalid percent parameter.");	
