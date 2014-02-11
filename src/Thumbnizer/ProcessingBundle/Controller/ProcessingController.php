@@ -17,7 +17,7 @@ class ProcessingController extends Controller {
      *	Crop image to a given width and height and return the cropped version
      *	@author Cristobal Sepulveda <cris@castrike.com>
      *	@param (int) $width Width to crop the image to.
-     *	@param (int) $height heightto crop the image to.
+     *	@param (int) $height height to crop the image to.
      *	@param (string) $url url of the image
      *	@return (Response) Image Data to be displayed
      */
@@ -39,8 +39,44 @@ class ProcessingController extends Controller {
     	} 
     }
 
+    /**
+     *  processingWHP
+     *  Crop image to a given width or height proportionally and return the cropped version
+     *  @author Cristobal Sepulveda <cris@castrike.com>
+     *  @param (string) $dimension Dimension to crop the image to.
+     *  @param (int) $value value to crop the image to.
+     *  @param (string) $url url of the image
+     *  @return (Response) Image Data to be displayed
+     */
+    public function processingWHPAction($dimension, $value, $source) {
+        try {
+            $processor = new ImageProcessor($source);
+            switch($dimentsion) {
+                case 'width':
+                    $width = $value;
+                    $height = "auto";
+                    break;
+                case 'height':
+                    $width = "auto";
+                    $height = $value;
+            }
+            $finalImage = $processor->resizeByWidthOrHeight($width,$height)->retrieveFinal();
+            $gmdate_expires = gmdate ('D, d M Y H:i:s', strtotime ('now +120  days')) . ' GMT';
+            $gmdate_modified = gmdate ('D, d M Y H:i:s') . ' GMT';
+            $headers = array(
+                'Content-Type' => $processor->getMime(),
+                'Last-Modified'=> $gmdate_modified,
+                'Cache-Control' => 'max-age=10368000, must-revalidate', //120 days
+                'Expires' => $gmdate_expires,
+            );
+            return new Response($finalImage, 200, $headers);    
+        } catch(\Exception $e) {
+            return new Response('<html><body>'.$e->getMessage().'</body></html>');  
+        } 
+    }
 
-    
+
+
 
     /**
      *	processingWHE
