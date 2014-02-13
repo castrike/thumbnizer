@@ -4,10 +4,20 @@ namespace Thumbnizer\ProcessingBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Config\Definition\Processor;
 
 use Thumbnizer\ProcessingBundle\ImageProcessor;
 
 class ProcessingController extends Controller {
+	
+	private function validateUrl($source) {
+		$config = Yaml::parse(file_get_contents(__DIR__.'/../Resources/config/allowedurls.yml'));
+		if(empty($config['urls'])) return true;
+		if(strpos($source,implode("|",$config['urls']))!==FALSE) return true;
+		return false;
+	}
+
     public function indexAction() {
         return $this->render('ThumbnizerProcessingBundle:Processing:default.html.twig', array('message' => "Silence is golden!"));
     }
@@ -23,6 +33,7 @@ class ProcessingController extends Controller {
      */
     public function processingWHAction($width, $height, $source) {
     	try {
+    		if(!$this->validateUrl($source)) throw new \Exception("Invalid Url");
     		$processor = new ImageProcessor($source);
     		$finalImage = $processor->resizeByWidthAndHeight($width,$height)->retrieveFinal();
     		$gmdate_expires = gmdate ('D, d M Y H:i:s', strtotime ('now +120  days')) . ' GMT';
@@ -50,8 +61,9 @@ class ProcessingController extends Controller {
      */
     public function processingWHPAction($dimension, $value, $source) {
         try {
+        	if(!$this->validateUrl($source)) throw new \Exception("Invalid Url");
             $processor = new ImageProcessor($source);
-            switch($dimentsion) {
+            switch($dimension) {
                 case 'width':
                     $width = $value;
                     $height = "auto";
@@ -89,8 +101,22 @@ class ProcessingController extends Controller {
      *	@return (Response) Image Data to be displayed
      */
     public function processingWHEAction($width, $height, $effect, $source) {
-    	$effects = array("grayscale","negate","sepia","vintage");
-
+    	try {
+    		if(!$this->validateUrl($source)) throw new \Exception("Invalid Url");
+    		$processor = new ImageProcessor($source);
+    		$finalImage = $processor->resizeByWidthAndHeight($width,$height)->addEffect($effect)->retrieveFinal();
+    		$gmdate_expires = gmdate ('D, d M Y H:i:s', strtotime ('now +120  days')) . ' GMT';
+			$gmdate_modified = gmdate ('D, d M Y H:i:s') . ' GMT';
+    		$headers = array(
+				'Content-Type' => $processor->getMime(),
+				'Last-Modified'=> $gmdate_modified,
+				'Cache-Control' => 'max-age=10368000, must-revalidate', //120 days
+				'Expires' => $gmdate_expires,
+			);
+    		return new Response($finalImage, 200, $headers);	
+    	} catch(\Exception $e) {
+    		return new Response('<html><body>'.$e->getMessage().'</body></html>');	
+    	} 
     }
 
     /**
@@ -103,6 +129,7 @@ class ProcessingController extends Controller {
      */
     public function processingPAction($percent, $source) {
     	try {
+    		if(!$this->validateUrl($source)) throw new \Exception("Invalid Url");
     		$processor = new ImageProcessor($source);
     		$finalImage = $processor->resizeByPercent($percent)->retrieveFinal();
     		$gmdate_expires = gmdate ('D, d M Y H:i:s', strtotime ('now +120  days')) . ' GMT';

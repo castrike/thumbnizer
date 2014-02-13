@@ -141,6 +141,45 @@ class ImageProcessor {
 		return $finalImage;
 	}
 
+	public function addEffect($effect) {
+		switch($effect) {
+			case 'grayscale':
+				imagefilter($this->canvas, IMG_FILTER_GRAYSCALE);
+				return $this;
+			case 'oldfashioned':
+				imagefilter($this->canvas, IMG_FILTER_GRAYSCALE);
+				imagegammacorrect($this->canvas, 1.0, 0.5);
+				imagefilter($this->canvas, IMG_FILTER_COLORIZE, 49, 56, 45);
+				imagefilter($this->canvas, IMG_FILTER_CONTRAST, 20);
+				return $this;
+			case 'sepia':
+				imagefilter($this->canvas, IMG_FILTER_GRAYSCALE);
+				imagefilter($this->canvas, IMG_FILTER_BRIGHTNESS, -20);
+				imagefilter($this->canvas, IMG_FILTER_CONTRAST, -10);
+				imagefilter($this->canvas, IMG_FILTER_COLORIZE, 80, 35, -10);
+				return $this;
+			case 'antique':
+				imagefilter($this->canvas, IMG_FILTER_BRIGHTNESS, -15);
+				imagefilter($this->canvas, IMG_FILTER_CONTRAST, -10);
+				imagefilter($this->canvas, IMG_FILTER_COLORIZE, 85, 50, 25);
+				return $this;
+			case 'vintage':
+				imagefilter($this->canvas, IMG_FILTER_BRIGHTNESS, 15);
+				imagefilter($this->canvas, IMG_FILTER_CONTRAST, -25);
+				imagefilter($this->canvas, IMG_FILTER_COLORIZE, -10, -5, -15);
+				imagefilter($this->canvas, IMG_FILTER_SMOOTH, 6);
+				imagefilter($this->canvas, IMG_FILTER_MEAN_REMOVAL);
+				return $this;
+			case 'lomo':
+				imagefilter($this->canvas, IMG_FILTER_BRIGHTNESS, 0);
+				imagefilter($this->canvas, IMG_FILTER_CONTRAST, -30);
+				imagefilter($this->canvas, IMG_FILTER_COLORIZE, 85, 50, 25);
+				return $this;
+			default:
+				throw new \Exception("Invalid effect to be applied.");	
+		}
+	}
+
 	/**
 	 * getMime
 	 * Return the file type of the image.
@@ -162,4 +201,20 @@ class ImageProcessor {
 			imagedestroy($this->canvas);
 		}
 	}
+
+	private function hsv2rgb($h,$s,$v) { 
+	if ($s==0) {
+		return array($v,$v,$v); 
+	} else { 
+		$h=($h%=360)/60; 
+		$i=floor($h); 
+		$f=$h-$i; 
+		$q[0]=$q[1]=$v*(1-$s); 
+		$q[2]=$v*(1-$s*(1-$f)); 
+		$q[3]=$q[4]=$v; 
+		$q[5]=$v*(1-$s*$f); 
+		//return(array($q[($i+4)%5],$q[($i+2)%5],$q[$i%5])); 
+		return(array($q[($i+4)%6],$q[($i+2)%6],$q[$i%6])); //[1] 
+	} 
+} 
 }

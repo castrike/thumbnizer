@@ -2,6 +2,15 @@ thumbnizer_default_route:
    path: /
    defaults: { _controller: ThumbnizerProcessingBundle:Processing:index}
 
+thumbnizer_processing_route4:
+   path: /{width}/{height}/{effect}/{source}
+   defaults: { _controller: ThumbnizerProcessingBundle:Processing:processingWHE}
+   requirements:
+        width: \d+
+        height: \d+
+        effect: \w+
+        source: .+
+
 thumbnizer_processing_route1:
    path: /{width}/{height}/{source}
    defaults: { _controller: ThumbnizerProcessingBundle:Processing:processingWH}
@@ -16,3 +25,12 @@ thumbnizer_processing_route2:
    requirements:
         percent: \d+
         source: .+
+
+thumbnizer_processing_route3:
+   path: /{dimension}/{value}/{source}
+   defaults: { _controller: ThumbnizerProcessingBundle:Processing:processingWHP}
+   requirements:
+        dimension: width|height
+        value: \d+
+        source: .+
+
