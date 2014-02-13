@@ -34,22 +34,25 @@ Setup Apache to allow encoded slashes
 3) Using the Application
 --------------------------------
     [Your CDN]/thumbnail/[width]/[height]/[public image url]
+    
+  * To Filter urls from using the application, essentially hot linking, the allowedurl.yml file must be updated with the list of urls. The file is located in /src/Thumbnizer/ProcessingBundle/Resources/config/.
 
 
-4) Coming Soon
+4) Coming On Future Releases.
 --------------------------------
-- Ability to use a configuration file to parse urls allowed to use this tool.
-- More functions. ( Crop image by %, add effects, rotate image )
-- Work as an API (Using API keys and stufff)
+- Work with AWS
 
 
 Enjoy!
 
 CREDITS:
-Thanks to marchibbins for the Filters and Effects.
-https://github.com/marchibbins/GD-Filter-testing
+Thanks to [marchibbins][3] for the inpiration Filters and Effects.
+Thanks to [Stoyan Stefanov][4] for more inspiration on how to implement the effects.
+
 
 [1]:  http://symfony.com/doc/2.4/quick_tour/the_big_picture.html
 [2]:  http://getcomposer.org/
+[3]:  https://github.com/marchibbins/GD-Filter-testing
+[4]:  http://www.phpied.com/image-fun-with-php-part-2/
 
 
