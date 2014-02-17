@@ -10,3 +10,4 @@
 /bin/
 /composer.phar
 .travis.yml
+/src/Thumbnizer/ProcessingBundle/Resources/config/config.yml

@@ -1,7 +1,0 @@
-urls:
-#    castrike:  "castrike.com"
-
-aws:
-    access_key:    "AKIAJRFVS4XGN3BCL2TQ"
-    secret_key:    "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"
-    bucket:        "thumbnizer"
