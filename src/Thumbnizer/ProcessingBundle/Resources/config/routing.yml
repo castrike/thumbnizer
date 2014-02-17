@@ -8,7 +8,7 @@ thumbnizer_processing_route4:
    requirements:
         width: \d+
         height: \d+
-        effect: \w+
+        effect: (grayscale|oldfashioned|sepia|antique|vintage|lomo)
         source: .+
 
 thumbnizer_processing_route1:

@@ -1,6 +1,11 @@
 <?php
 namespace Thumbnizer\ProcessingBundle;
 
+use Symfony\Component\Yaml\Yaml;
+use Aws\S3\S3Client;
+use Guzzle\Http\Client;
+
+
 class ImageProcessor {
 	// (resource) original image
 	private $image;
@@ -14,18 +19,26 @@ class ImageProcessor {
 	 * Instantiate the image resource for the image we want to edit.
 	 * If an image can't be retrieved or resource can't be created, throw an exception.
 	 * @param (string)	$image_url	url/path of the image.
+	 * @param (Array)	$aws 		AWS information ( signedurl, mime type and content length)
 	 */
-	public function __construct($image_url) {
-		$image_url = urldecode($image_url);
-		$headers = @get_headers($image_url,1);
-    	if(empty($headers) || !preg_match('/200/',$headers[0])) {
-    		throw new \Exception("Image was not found.");
-    	}
-    	$this->imageInfo = array();
-    	$this->imageInfo['src'] = $image_url;
-        $this->imageInfo['mime'] = $headers['Content-Type'];
-        $this->imageInfo['length'] = $headers['Content-Length'];
-        switch($this->imageInfo['mime']) {
+	public function __construct($image_url, $aws = '') {
+		if(is_array($aws)) {
+			$this->imageInfo = array();
+	    	$this->imageInfo['src'] = $aws['signedurl'];
+	        $this->imageInfo['mime'] = $aws['mime'];
+	        $this->imageInfo['length'] = $aws['length'];
+		} else {
+			$image_url = urldecode($image_url);
+			$headers = @get_headers($image_url,1);
+	    	if(empty($headers) || !preg_match('/200/',$headers[0])) {
+	    		throw new \Exception("Image was not found.");
+	    	}
+	    	$this->imageInfo = array();
+	    	$this->imageInfo['src'] = $image_url;
+	        $this->imageInfo['mime'] = $headers['Content-Type'];
+	        $this->imageInfo['length'] = $headers['Content-Length'];		
+		}
+		switch($this->imageInfo['mime']) {
         	case 'image/jpeg': 
         		$this->image = @imagecreatefromjpeg($this->imageInfo['src']); 
         		break;

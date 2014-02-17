@@ -6,16 +6,36 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Definition\Processor;
+use Aws\S3\S3Client;
 
 use Thumbnizer\ProcessingBundle\ImageProcessor;
 
 class ProcessingController extends Controller {
 	
-	private function validateUrl($source) {
-		$config = Yaml::parse(file_get_contents(__DIR__.'/../Resources/config/allowedurls.yml'));
-		if(empty($config['urls'])) return true;
-		if(strpos($source,implode("|",$config['urls']))!==FALSE) return true;
-		return false;
+	private function validateRequest($source) {
+		$config = Yaml::parse(file_get_contents(__DIR__.'/../Resources/config/config.yml'));
+		if(strpos($source,"http")!==FALSE) {
+			if(empty($config['urls'])) return true;
+			if(strpos($source,implode("|",$config['urls']))!==FALSE) return true;
+			return false;
+		} else {
+			$client = S3Client::factory( array(
+				'key'=>$config['aws']['access_key'],
+				'secret'=>$config['aws']['secret_key'],
+			));
+			$response = $client->headObject(array(
+				'Bucket'=>$config['aws']['bucket'],
+				'Key'=>$source,
+			));
+			if(!is_object($response)) return false;
+			$result = array();
+			$result['signedurl'] = $client->getObjectUrl($config['aws']['bucket'],$source,"+1 minute");
+			$result['mime'] = $response->get('ContentType');
+	        $result['length'] = $response->get('ContentLength');
+			return $result;
+			
+		}
+
 	}
 
     public function indexAction() {
@@ -33,8 +53,8 @@ class ProcessingController extends Controller {
      */
     public function processingWHAction($width, $height, $source) {
     	try {
-    		if(!$this->validateUrl($source)) throw new \Exception("Invalid Url");
-    		$processor = new ImageProcessor($source);
+    		if(!($aws = $this->validateRequest($source))) throw new \Exception("Invalid Url");  		
+    		$processor = new ImageProcessor($source, $aws);
     		$finalImage = $processor->resizeByWidthAndHeight($width,$height)->retrieveFinal();
     		$gmdate_expires = gmdate ('D, d M Y H:i:s', strtotime ('now +120  days')) . ' GMT';
 			$gmdate_modified = gmdate ('D, d M Y H:i:s') . ' GMT';
@@ -46,7 +66,7 @@ class ProcessingController extends Controller {
 			);
     		return new Response($finalImage, 200, $headers);	
     	} catch(\Exception $e) {
-    		return new Response('<html><body>'.$e->getMessage().'</body></html>');	
+    		return new Response('<html><body>'.$e->getMessage().'</body></html>',400);	
     	} 
     }
 
@@ -61,8 +81,8 @@ class ProcessingController extends Controller {
      */
     public function processingWHPAction($dimension, $value, $source) {
         try {
-        	if(!$this->validateUrl($source)) throw new \Exception("Invalid Url");
-            $processor = new ImageProcessor($source);
+        	if(!($aws = $this->validateRequest($source))) throw new \Exception("Invalid Url");  
+            $processor = new ImageProcessor($source, $aws);
             switch($dimension) {
                 case 'width':
                     $width = $value;
@@ -102,8 +122,8 @@ class ProcessingController extends Controller {
      */
     public function processingWHEAction($width, $height, $effect, $source) {
     	try {
-    		if(!$this->validateUrl($source)) throw new \Exception("Invalid Url");
-    		$processor = new ImageProcessor($source);
+    		if(!($aws = $this->validateRequest($source))) throw new \Exception("Invalid Url");  
+            $processor = new ImageProcessor($source, $aws);
     		$finalImage = $processor->resizeByWidthAndHeight($width,$height)->addEffect($effect)->retrieveFinal();
     		$gmdate_expires = gmdate ('D, d M Y H:i:s', strtotime ('now +120  days')) . ' GMT';
 			$gmdate_modified = gmdate ('D, d M Y H:i:s') . ' GMT';
@@ -129,8 +149,8 @@ class ProcessingController extends Controller {
      */
     public function processingPAction($percent, $source) {
     	try {
-    		if(!$this->validateUrl($source)) throw new \Exception("Invalid Url");
-    		$processor = new ImageProcessor($source);
+    		if(!($aws = $this->validateRequest($source))) throw new \Exception("Invalid Url");  
+            $processor = new ImageProcessor($source, $aws);
     		$finalImage = $processor->resizeByPercent($percent)->retrieveFinal();
     		$gmdate_expires = gmdate ('D, d M Y H:i:s', strtotime ('now +120  days')) . ' GMT';
 			$gmdate_modified = gmdate ('D, d M Y H:i:s') . ' GMT';
@@ -145,4 +165,5 @@ class ProcessingController extends Controller {
     		return new Response('<html><body>'.$e->getMessage().'</body></html>');	
     	}
     }
+
 }
